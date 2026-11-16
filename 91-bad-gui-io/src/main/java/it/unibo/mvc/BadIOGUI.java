@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
 
@@ -46,6 +48,32 @@ public class BadIOGUI {
         canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        /* 
+         * Create a new JPanel 
+         */
+        final JPanel newPanel = new JPanel();
+        /* 
+         * Use an horizontal BoxLayout as layout
+         */
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.X_AXIS));
+        /*
+         * Set the new JPanel as the only content of the center of the current BorderLayout 
+         */
+        canvas.remove(write);
+        canvas.add(newPanel, BorderLayout.CENTER);
+        /*
+         *Add the "write" JButton to the new panel 
+         */
+        newPanel.add(write);
+        /* 
+         * Create a new "Read" button
+         */
+        final JButton read = new JButton("Read from file");
+        /* 
+         * Add it to the JPanel created in Ex 01.01
+        */
+        newPanel.add(read);
+
         /*
          * Handlers
          */
@@ -65,6 +93,26 @@ public class BadIOGUI {
                     } catch (final IOException e) {
                         JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
                         e.printStackTrace(); // NOPMD: allowed as this is just an exercise
+                    }
+                }
+            }
+        );
+        /* 
+         * Write a new ActionListener for the new button, 
+         * in form of anonymous class, that prints a string
+         * on terminal (use System.out) when the button is pressed.
+         */
+        read.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent ignored) {
+                    IO.println("you pressed THE button");
+                    try {
+                        final List<String> lines = Files.readAllLines(Paths.get(PATH));
+                        for (final String s: lines) {
+                            IO.println(s);
+                        }
+                    } catch (final IOException | InvalidPathException e) {
+                        IO.println("ERROR: " + e.getMessage());
                     }
                 }
             }
@@ -90,6 +138,11 @@ public class BadIOGUI {
          * on screen. Results may vary, but it is generally the best choice.
          */
         frame.setLocationByPlatform(true);
+        /*
+         * In display(), use JFrame.pack() to resize the frame to 
+         * the minimum size prior to displaying
+         */
+        frame.pack();
         /*
          * OK, ready to push the frame onscreen
          */
